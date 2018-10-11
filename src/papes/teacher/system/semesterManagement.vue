@@ -2,15 +2,13 @@
     <div id="classMan_page">
         <div class="headSearch">
             <el-form class="search_form"   label-width="50px" :model="searchForm" :inline="true">
-                <el-form-item label="轮次" >
+                <el-form-item label="年级" >
                     <el-select v-model="searchForm.gradeId" size="mini">
+                        <el-option value="" key="0" label="全部"></el-option>
                         <el-option value="1" key="1" label="高一"></el-option>
                         <el-option value="2" key="2" label="高二"></el-option>
                         <el-option value="3" key="3" label="高三"></el-option>
                     </el-select>
-                </el-form-item>
-                <el-form-item label="日期" >
-
                 </el-form-item>
                 <div style="display: inline-block;height: 40px;line-height: 40px">
                     <el-button @click="onSearch"  size="mini">查询</el-button>
@@ -31,25 +29,28 @@
                         label="序号">
                 </el-table-column>
                 <el-table-column
-                        prop="gradeInfo.gradeName"
+                        prop="gradeName"
                         label="年级">
                 </el-table-column>
                 <el-table-column
-                        prop="gradeClassName"
-                        label="班级名称">
+                        prop="yearInfo.yearName"
+                        label="学期">
                 </el-table-column>
                 <el-table-column
-                        prop="teacherName"
-                        label="班主任">
+                        prop="examTime"
+                        label="考试时间">
                 </el-table-column>
                 <el-table-column
-                        prop="classType"
-                        :formatter="classTypeFormatter"
-                        label="班级分类">
+                        prop="semesterName"
+                        label="考试轮次">
                 </el-table-column>
                 <el-table-column
-                        prop="studentCount"
-                        label="班级人数">
+                        prop="scoreBeginDeadline"
+                        label="录入成绩开始时间">
+                </el-table-column>
+                <el-table-column
+                        prop="scoreEndDeadline"
+                        label="录入成绩结束时间">
                 </el-table-column>
                 <el-table-column
                         width="150"
@@ -66,29 +67,47 @@
                 </el-table-column>
             </el-table>
         </div>
-        <el-dialog title="新增" :visible.sync="dialogAddVisible">
-            <el-form :model="addForm" label-width="80px">
+        <el-dialog :title="addFlag?'新增':'修改'" :visible.sync="dialogAddVisible" @close="onCancle">
+            <el-form :model="addForm" label-width="150px">
                 <el-form-item label="年级" >
-                    <el-select v-model="addForm.gradeId" size="mini">
+                    <el-select v-model="addForm.gradeId">
                         <el-option value="1" key="1" label="高一"></el-option>
                         <el-option value="2" key="2" label="高二"></el-option>
                         <el-option value="3" key="3" label="高三"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="班级分类" >
-                    <el-select v-model="addForm.classType" size="mini">
-                        <el-option value="1" key="1" label="理科"></el-option>
-                        <el-option value="2" key="2" label="文科"></el-option>
-                        <el-option value="3" key="3" label="未分科"></el-option>
+                <el-form-item label="学期" >
+                    <el-select v-model="addForm.yearId">
+                        <el-option value="1" key="1" label="上半学期"></el-option>
+                        <el-option value="2" key="2" label="下半学期"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="班级名称" :label-width="formLabelWidth">
-                    <el-input v-model="addForm.className" autocomplete="off"></el-input>
+                <el-form-item label="考试日期" >
+                    <el-date-picker
+                            v-model="addForm.examTime"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="选择日期时间">
+                    </el-date-picker>
                 </el-form-item>
-                <el-form-item label="班主任" :label-width="formLabelWidth">
-                    <el-select v-model="addForm.teacherId" size="mini">
-                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in teacherArr"></el-option>
-                    </el-select>
+                <el-form-item label="成绩录入开始时间" >
+                    <el-date-picker
+                            v-model="addForm.scoreBeginDeadline"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="选择日期时间">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="成绩录入结束时间" >
+                    <el-date-picker
+                            v-model="addForm.scoreEndDeadline"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="选择日期时间">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="考试轮次" >
+                    <el-input v-model="addForm.semesterName"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -106,15 +125,16 @@
             return{
                 formLabelWidth:'80px',
                 searchForm:{
-                    gradeName:'',
-                    classType:''
+                    gradeId:''
                 },
                 addForm:{
                     gradeId: '',
-                    className: '',
-                    classId: '',
-                    teacherId: '',
-                    classType: ''
+                    semesterName:'',
+                    scoreBeginDeadline:'',
+                    scoreEndDeadline:'',
+                    semesterId:'',
+                    yearId:'',
+                    examTime:''
                 },
                 tableData: [],
                 teacherArr: [],
@@ -123,31 +143,13 @@
             }
         },
         mounted(){
-            this.queryClass();
-            this.queryTeacherId();
+            this.querySemesterInfo({});
         },
         methods:{
-            //班级分类翻译
-            classTypeFormatter(val){
-                let newVal='';
-                switch (val.classType){
-                    case  '1':
-                        newVal= '理科';
-                        break;
-                    case '2':
-                        newVal='文科';
-                        break;
-                    default :
-                        newVal = "未分科";
-                        break;
-
-                }
-                return newVal;
-            },
-            //获取班级列表数据
-            queryClass(gradeId,classType){
+            //获取轮次列表数据
+            querySemesterInfo(record){
                 this.tableData=[];
-                this.$axiosF('classInfo/list','get',{gradeId:gradeId||'',classType:classType||''},res=>{
+                this.$axiosF('semesterInfo/list','get',{gradeId:record.gradeId||''},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data
                     }else{
@@ -155,28 +157,13 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
 
             },
-            //获取班主任下拉框数据
-            queryTeacherId(){
-                this.teacherArr=[];
-                this.$axiosF('teacherInfo/list','get',{teacherDuty:'1'},res=>{
-                    if(res.data.success){
-                        this.teacherArr=res.data.data
-                    }else{
-                        this.$alert(res.data.message, '错误提示', {
-                            confirmButtonText: '确定'})
-                    }
-                },err=>{
-                    this.$alert(err.data.message, '错误提示', {
-                        confirmButtonText: '确定'})
-                })
-            },
             onSearch(){
-                this.queryClass(this.searchForm.gradeName,this.searchForm.classType)
+                this.querySemesterInfo(this.searchForm)
             },
             onAdd(){
                 this.addFlag=true;
@@ -185,34 +172,36 @@
             onSubmit(){
                 let url='';
                 if(this.addFlag){
-                    url='classInfo/insert'
+                    url='semesterInfo/insert'
                 }else{
-                    url='classInfo/update'
+                    url='semesterInfo/update'
                 }
                 this.$axiosF(url,'post',this.addForm,res=>{
                     if(res.data.success){
+                        this.dialogAddVisible = false;
                         // this.tableData=res.data.data
-                        this.queryClass();
-                        this.dialogAddVisible = false
+                        this.querySemesterInfo({});
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
                     }
 
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 });
             },
             onCancle(){
                 this.addForm={
                     gradeId: '',
-                    className: '',
-                    teacherId: '',
-                    classId: '',
-                    classType: ''
+                    yearId: '',
+                    semesterName:'',
+                    semesterId:'',
+                    scoreBeginDeadline:'',
+                    scoreEndDeadline:'',
+                    examTime:''
                 };
-                dialogAddVisible = false
+                this.dialogAddVisible = false
             },
             onImport(){
 
@@ -221,15 +210,15 @@
 
             },
             handleDelete(index,row){
-                this.$axiosF('classInfo/deleteByIds','post',{ids:[row.classId]},res=>{
+                this.$axiosF('semesterInfo/deleteByIds','post',{ids:[row.semesterId]},res=>{
                     if(res.data.success){
-                        this.queryClass()
+                        this.querySemesterInfo({})
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
@@ -238,10 +227,12 @@
                 this.dialogAddVisible=true;
                 this.addForm={
                     gradeId: row.gradeId,
-                    className: row.className,
-                    teacherId: row.teacherId,
-                    classId: row.classId,
-                    classType: row.classType
+                    yearId: row.yearId,
+                    semesterId: row.semesterId,
+                    semesterName: row.semesterName,
+                    scoreBeginDeadline: row.scoreBeginDeadline,
+                    scoreEndDeadline: row.scoreEndDeadline,
+                    examTime: row.examTime
                 };
             }
         }

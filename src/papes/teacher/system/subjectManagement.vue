@@ -20,6 +20,10 @@
                     :formatter="subjectTypeFormatter"
                     label="科目类型">
             </el-table-column>
+            <el-table-column
+                    prop="subjectOrd"
+                    label="科目权重 ">
+            </el-table-column>
         </el-table>
     </div>
 </template>
@@ -69,7 +73,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             }

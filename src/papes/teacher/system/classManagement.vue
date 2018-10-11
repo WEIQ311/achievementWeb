@@ -76,14 +76,14 @@
         <el-dialog :title='addFlag?"新增":"修改"' :visible.sync="dialogAddVisible" @close="addClassClose">
             <el-form :model="addForm" label-width="80px">
                 <el-form-item label="年级" >
-                    <el-select v-model="addForm.gradeId" size="mini">
+                    <el-select v-model="addForm.gradeId" >
                         <el-option value="1" key="1" label="高一"></el-option>
                         <el-option value="2" key="2" label="高二"></el-option>
                         <el-option value="3" key="3" label="高三"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级分类" >
-                    <el-select v-model="addForm.classType" size="mini">
+                    <el-select v-model="addForm.classType" >
                         <el-option value="1" key="1" label="理科"></el-option>
                         <el-option value="2" key="2" label="文科"></el-option>
                         <el-option value="3" key="3" label="未分科"></el-option>
@@ -93,7 +93,7 @@
                     <el-input v-model="addForm.className" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="班主任" :label-width="formLabelWidth">
-                    <el-select v-model="addForm.teacherId" size="mini">
+                    <el-select v-model="addForm.teacherId" >
                         <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in teacherArr"></el-option>
                     </el-select>
                 </el-form-item>
@@ -105,8 +105,50 @@
         </el-dialog>
         <el-dialog title="教师选配" :visible.sync="dialogAddTeacherVisible">
             <el-form :model="addTeacherForm" label-width="80px">
-                <el-form-item label="语文" :label-width="formLabelWidth" >
-                    <el-input v-model="addForm.className" autocomplete="off"></el-input>
+                <el-form-item label="语文" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subLanguage" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['语文']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="数学" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subMathematics" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['数学']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="英语" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subEnglish" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['英语']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="物理" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subPhysical" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['物理']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="化学" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subChemistry" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['化学']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="生物" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subBiological" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['生物']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="政治" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subPolitical" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['政治']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="历史" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subHistory" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['历史']"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="地理" :label-width="formLabelWidth">
+                    <el-select v-model="addTeacherForm.subGeography" >
+                        <el-option :value="item.teacherId" :key="item.teacherId" :label="item.teacherName" v-for="item in subjectTeacherArrObj['地理']"></el-option>
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -135,13 +177,24 @@
                     classType: ''
                 },
                 addTeacherForm:{
-                    className:''
+                    subLanguage:'',
+                    subMathematics:'',
+                    subEnglish:'',
+                    subPhysical:'',
+                    subChemistry:'',
+                    subBiological:'',
+                    subPolitical:'',
+                    subHistory:'',
+                    subGeography:''
                 },
                 tableData: [],
                 teacherArr: [],
+                subjectTeacherArr: [],
+                subjectTeacherArrObj: {},
                 dialogAddVisible:false,
                 dialogAddTeacherVisible:false,
                 addFlag:true,
+                teacherTypeFlag:"1"
             }
         },
         mounted(){
@@ -177,7 +230,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
 
@@ -193,10 +246,34 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
+            //获取选配科目老师
+            querySubjectTeacher(record){
+                this.subjectTeacherArr=[];
+                this.subjectTeacherArrObj={};
+                debugger
+                this.$axiosF('confTeacherClass/confTeacherSubject','get',{classType:record.classType||"",classId:record.classId||''},res=>{
+                    if(res.data.success){
+                        this.subjectTeacherArr=res.data.data;
+                        let obj={};
+                        ires.data.data.forEach(item=>{
+                            obj[item.subjectId]=item.teacherInfos
+                        });
+                        this.subjectTeacherArrObj=obj;
+                        debugger
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+            },
+            //编辑回显
             handleEdit(index,row){
                 this.addFlag=false;
                 this.dialogAddVisible=true;
@@ -249,7 +326,7 @@
                     }
 
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 });
             },
@@ -277,7 +354,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
@@ -294,6 +371,10 @@
             },
             handleSelect(index,row){
                 this.dialogAddTeacherVisible=true;
+                setTimeout(()=>{
+                    this.querySubjectTeacher(row);
+                },200)
+
             }
         }
     }

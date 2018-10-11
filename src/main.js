@@ -6,7 +6,7 @@ import axios from 'axios';
 import 'element-ui/lib/theme-chalk/index.css';
 import App from './App.vue'
 import routes from './router/router.js'
-const baseURL='http://campus.picp.net/score/';
+window.baseURL='http://campus.picp.net/score/';
 Vue.config.productionTip = false;
 Vue.prototype.$axiosF = axiosF;
 Vue.prototype.$qs = qs;
@@ -52,6 +52,7 @@ function axiosF(url,type,data,callBackRes,callBackErr) {
     axios(param).then(res=>{
        return callBackRes(res)
     }).catch(err=>{
+        debugger
          return callBackErr(err)
     });
 }

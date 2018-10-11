@@ -127,22 +127,7 @@
                     teacherDuty: '2',
                     telPhone: ''
                 },
-                tableData: [{
-                    teacherName: '李老师',
-                    userRole: '管理员',
-                    subjectId: '化学',
-                    telPhone: '17600000000'
-                },{
-                    teacherName: '张老师',
-                    userRole: '班主任',
-                    subjectId: '物理',
-                    telPhone: '17600000001'
-                },{
-                    teacherName: '王老师',
-                    userRole: '老师',
-                    subjectId: '语文',
-                    telPhone: '17600000000'
-                }],
+                tableData: [],
                 subjectArr:[],
                 subjectArrObj:{},
                 dialogAddVisible:false,
@@ -150,7 +135,7 @@
             }
         },
         mounted(){
-            this.queryTeacherData();
+            this.queryTeacherData({});
             this.querySubjectData();
         },
         methods:{
@@ -194,7 +179,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
@@ -209,7 +194,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
@@ -228,20 +213,20 @@
                             message: res.data.message,
                             type: 'success'
                         });
-                        this.queryTeacherData();
-                        this.dialogAddVisible = false
+                        this.dialogAddVisible = false;
+                        this.queryTeacherData({});
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
                     }
 
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 });
             },
             onSearch(){
-                this.queryTeacherData(this.searchForm.teacherName,this.searchForm.teacherDuty,this.searchForm.teacherNum)
+                    this.queryTeacherData(this.searchForm)
 
             },
             onAdd(){
@@ -269,13 +254,13 @@
                             message: res.data.message,
                             type: 'success'
                         });
-                        this.queryTeacherData()
+                        this.queryTeacherData({})
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },

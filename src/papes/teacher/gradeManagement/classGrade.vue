@@ -1,5 +1,32 @@
 <template>
     <div id="studentMan_page">
+        <div class="headSearch">
+            <el-form class="search_form"   label-width="50px" :model="searchForm" :inline="true">
+                <el-form-item label="年级" >
+                    <el-select v-model="searchForm.gradeId" size="mini">
+                        <el-option value="1" key="1" label="高一"></el-option>
+                        <el-option value="2" key="2" label="高二"></el-option>
+                        <el-option value="3" key="3" label="高三"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="班级分类" >
+                    <el-select v-model="searchForm.classType" size="mini">
+                        <el-option value="1" key="1" label="理科"></el-option>
+                        <el-option value="2" key="2" label="文科"></el-option>
+                        <el-option value="3" key="3" label="未分科"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="轮次" >
+                    <el-select v-model="searchForm.semesterId" size="mini">
+                        <el-option :label="item.semesterName" :value="item.semesterId" v-for="item in dateNameArr"></el-option>
+                    </el-select>
+                </el-form-item>
+                <div style="display: inline-block;height: 40px;line-height: 40px">
+                    <el-button @click="onSearch"  size="mini">查询</el-button>
+                </div>
+            </el-form>
+
+        </div>
         <div class="searchMain">
             <el-table
                     :data="tableData"
@@ -13,49 +40,72 @@
                         label="序号">
                 </el-table-column>
                 <el-table-column
-                        v-if="false"
-                        prop="date"
+                        prop="examTime"
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="dateName"
+                        prop="semesterId"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
-                        prop="className"
+                        prop="studentName"
+                        label="姓名">
+                </el-table-column>
+                <el-table-column
+                        prop="studentNum"
+                        label="学号">
+                </el-table-column>
+                <el-table-column
+                        prop="gradeClassName"
+                        width="100"
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        prop="Chinese"
+                        prop="subLanguage"
                         label="语文">
                 </el-table-column>
                 <el-table-column
-                        prop="mathematics"
+                        prop="subMathematics"
                         label="数学">
                 </el-table-column>
                 <el-table-column
-                        prop="English"
+                        prop="subEnglish"
                         label="英语">
                 </el-table-column>
                 <el-table-column
-                        prop="physical"
+                        prop="subPhysical"
                         label="物理">
                 </el-table-column>
                 <el-table-column
-                        prop="Chemistry"
+                        prop="subChemistry"
                         label="化学">
                 </el-table-column>
                 <el-table-column
-                        prop="biological"
+                        prop="subBiological"
                         label="生物">
                 </el-table-column>
                 <el-table-column
-                        prop="allSum"
+                        v-if="classType==='2'"
+                        prop="subPolitical"
+                        label="政治">
+                </el-table-column>
+                <el-table-column
+                        v-if="classType==='2'"
+                        prop="subHistory"
+                        label="历史">
+                </el-table-column>
+                <el-table-column
+                        v-if="classType==='2'"
+                        prop="subGeography"
+                        label="地理">
+                </el-table-column>
+                <el-table-column
+                        prop="subScoreSum"
                         label="总分">
                 </el-table-column>
                 <el-table-column
-                        prop="allIndex"
-                        label="年级排名">
+                        prop="gradeRanking"
+                        label="排名">
                 </el-table-column>
                 <el-table-column
                         width="150"
@@ -80,49 +130,74 @@
                         width="50"
                         label="序号">
                 </el-table-column>
+
                 <el-table-column
-                        prop="date"
+                        prop="examTime"
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="dateName"
+                        prop="semesterId"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
-                        prop="className"
+                        prop="studentName"
+                        label="姓名">
+                </el-table-column>
+                <el-table-column
+                        prop="studentNum"
+                        label="学号">
+                </el-table-column>
+                <el-table-column
+                        prop="gradeClassName"
+                        width="100"
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        prop="Chinese"
+                        prop="subLanguage"
                         label="语文">
                 </el-table-column>
                 <el-table-column
-                        prop="mathematics"
+                        prop="subMathematics"
                         label="数学">
                 </el-table-column>
                 <el-table-column
-                        prop="English"
+                        prop="subEnglish"
                         label="英语">
                 </el-table-column>
                 <el-table-column
-                        prop="physical"
+                        prop="subPhysical"
                         label="物理">
                 </el-table-column>
                 <el-table-column
-                        prop="Chemistry"
+                        prop="subChemistry"
                         label="化学">
                 </el-table-column>
                 <el-table-column
-                        prop="biological"
+                        prop="subBiological"
                         label="生物">
                 </el-table-column>
                 <el-table-column
-                        prop="allSum"
+                        v-if="classType==='2'"
+                        prop="subPolitical"
+                        label="政治">
+                </el-table-column>
+                <el-table-column
+                        v-if="classType==='2'"
+                        prop="subHistory"
+                        label="历史">
+                </el-table-column>
+                <el-table-column
+                        v-if="classType==='2'"
+                        prop="subGeography"
+                        label="地理">
+                </el-table-column>
+                <el-table-column
+                        prop="subScoreSum"
                         label="总分">
                 </el-table-column>
                 <el-table-column
-                        prop="allIndex"
-                        label="年级排名">
+                        prop="gradeRanking"
+                        label="排名">
                 </el-table-column>
             </el-table>
             <div slot="footer" class="dialog-footer">
@@ -138,79 +213,60 @@
         name: "grade-add",
         data(){
             return{
+                searchForm:{
+                    gradeId:'',
+                    semesterId:'',
+                    classType:''
+                },
+                classType:'1',
+                dateNameArr:[],
                 formLabelWidth:'80px',
-                tableData:[ {
-                    date: '2016-05-02',
-                    dateName: '第二次月考',
-                    className : '高二1班',
-                    Chinese : '100',
-                    mathematics : '88',
-                    English:'108',
-                    physical : '88',
-                    Chemistry : '33',
-                    biological : '66',
-                    allSum : '366',
-                    allIndex:98
-                }],
-                tableDataAll:[
-                    {
-                        date: '2016-05-02',
-                        dateName: '第一次月考',
-                        className : '高二1班',
-                        Chinese : '100',
-                        mathematics : '88',
-                        English:'108',
-                        physical : '88',
-                        Chemistry : '33',
-                        biological : '66',
-                        allSum : '366',
-                        allIndex:48
-                    },{
-                        date: '2016-05-02',
-                        dateName: '第二次月考',
-                        className : '高二1班',
-                        Chinese : '100',
-                        mathematics : '88',
-                        English:'108',
-                        physical : '88',
-                        Chemistry : '33',
-                        biological : '66',
-                        allSum : '366',
-                        allIndex:98
-                    },{
-                        date: '2016-05-02',
-                        dateName: '第三次月考',
-                        className : '高二1班',
-                        Chinese : '100',
-                        mathematics : '88',
-                        English:'108',
-                        physical : '88',
-                        Chemistry : '33',
-                        biological : '66',
-                        allSum : '366',
-                        allIndex:88
-                    }
-                ],
+                tableData:[],
+                tableDataAll:[],
                 dialogAllVisible:false
             }
         },
+        mounted(){
+            this.querySemesterData()
+        },
         methods:{
             onSearch(){
+                this.queryClassScoreData(this.searchForm);
+            },
+            //获取轮次信息
+            querySemesterData(){
+                this.dateNameArr=[];
+                this.$axiosF('semesterInfo/list','get',{gradeId:'1'},res=>{
+                    if(res.data.success){
+                        this.dateNameArr=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+
+            },
+            //获取班级成绩数据
+            queryClassScoreData(record){
+                this.tableData=[];
+                this.$axiosF('listByClass/list','get',{gradeId:record.gradeId||'1',semesterId:record.semesterId||'',classType:record.classType||''},res=>{
+                    if(res.data.success){
+                        this.tableData=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
 
             },
             handleInfo(){
                 this.dialogAllVisible=true
-            },
-            onImport(){
-
-            },
-            onDownLoad(){
-
-            },
-            handleDelete(){
-            },
-            handleEdit(){
-
             }
         }
     }
@@ -229,5 +285,7 @@
         height: calc(100% - 62px);
         background: green;
     }
-
+    .classType{
+        display: inline-block;
+    }
 </style>
