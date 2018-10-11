@@ -61,46 +61,46 @@
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        prop="subLanguage"
+                        prop="avgLanguage"
                         label="语文">
                 </el-table-column>
                 <el-table-column
-                        prop="subMathematics"
+                        prop="avgMathematics"
                         label="数学">
                 </el-table-column>
                 <el-table-column
-                        prop="subEnglish"
+                        prop="avgEnglish"
                         label="英语">
                 </el-table-column>
                 <el-table-column
-                        prop="subPhysical"
+                        prop="avgPhysical"
                         label="物理">
                 </el-table-column>
                 <el-table-column
-                        prop="subChemistry"
+                        prop="avgChemistry"
                         label="化学">
                 </el-table-column>
                 <el-table-column
-                        prop="subBiological"
+                        prop="avgBiological"
                         label="生物">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
-                        prop="subPolitical"
+                        prop="avgPolitical"
                         label="政治">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
-                        prop="subHistory"
+                        prop="avgHistory"
                         label="历史">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
-                        prop="subGeography"
+                        prop="avgGeography"
                         label="地理">
                 </el-table-column>
                 <el-table-column
-                        prop="subScoreSum"
+                        prop="avgScoreSum"
                         label="总分">
                 </el-table-column>
                 <el-table-column
@@ -153,46 +153,46 @@
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        prop="subLanguage"
+                        prop="avgLanguage"
                         label="语文">
                 </el-table-column>
                 <el-table-column
-                        prop="subMathematics"
+                        prop="avgMathematics"
                         label="数学">
                 </el-table-column>
                 <el-table-column
-                        prop="subEnglish"
+                        prop="avgEnglish"
                         label="英语">
                 </el-table-column>
                 <el-table-column
-                        prop="subPhysical"
+                        prop="avgPhysical"
                         label="物理">
                 </el-table-column>
                 <el-table-column
-                        prop="subChemistry"
+                        prop="avgChemistry"
                         label="化学">
                 </el-table-column>
                 <el-table-column
-                        prop="subBiological"
+                        prop="avgBiological"
                         label="生物">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
-                        prop="subPolitical"
+                        prop="avgPolitical"
                         label="政治">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
-                        prop="subHistory"
+                        prop="avgHistory"
                         label="历史">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
-                        prop="subGeography"
+                        prop="avgGeography"
                         label="地理">
                 </el-table-column>
                 <el-table-column
-                        prop="subScoreSum"
+                        prop="avgScoreSum"
                         label="总分">
                 </el-table-column>
                 <el-table-column

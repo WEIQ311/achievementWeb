@@ -724,6 +724,12 @@
     .el-select{
         width: 100%;
     }
+    body .el-table th.gutter {
+        display: table-cell !important;
+    }
+     tr td,th{
+        text-align: center!important;
+    }
     .el-date-editor{
         width: 100%!important;
     }
