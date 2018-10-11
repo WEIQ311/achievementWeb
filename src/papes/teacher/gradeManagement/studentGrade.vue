@@ -50,7 +50,7 @@
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="semesterId"
+                        prop="semesterName"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
@@ -134,11 +134,11 @@
             <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
-                    :current-page="currentPage4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
+                    :current-page="currentPage"
+                    :page-sizes="[30, 50, 100, 200]"
+                    :page-size="pageSize"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
+                    :total="totalSize">
             </el-pagination>
         </div>
         <el-dialog :title="addFlag?'新增':'修改'" :visible.sync="dialogAddVisible" @close="addFormClose">
@@ -148,23 +148,22 @@
                         <el-option :label="item.semesterName" :value="item.semesterId" v-for="item in dateNameArr"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="班级分类" :label-width="formLabelWidth" @select="classTypeSelect">
-                    <el-select v-model="addForm.classType" placeholder="">
+                <el-form-item label="班级分类" :label-width="formLabelWidth"  >
+                    <el-select v-model="addForm.classType" placeholder="" @change="classTypeSelect">
                         <el-option label="理科" value="1"></el-option>
                         <el-option label="文科" value="2"></el-option>
                         <el-option label="未分科" value="3"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="班级" :label-width="formLabelWidth">
-                    <el-select v-model="addForm.classId" >
-                        <el-option :label="item.gradeClassName" :value="item.classId" v-for="item in classNameArr"></el-option>
+                <el-form-item label="班级" :label-width="formLabelWidth" >
+                    <el-select v-model="addForm.classId"  @change="classIdSelect" >
+                        <el-option :label="item.gradeClassName" :value="item.classId" v-for="item in classNameArrAll"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="学号" :label-width="formLabelWidth">
-                    <el-input v-model="addForm.studentNum" autocomplete="off"></el-input>
-                </el-form-item>
                 <el-form-item label="考生姓名" :label-width="formLabelWidth">
-                    <el-input v-model="addForm.studentId" autocomplete="off"></el-input>
+                    <el-select v-model="addForm.studentId" placeholder="">
+                        <el-option :label="item.studentName" :value="item.studentId" :key="item.studentId" v-if=" item in studentArr"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="语文" :label-width="formLabelWidth">
                     <el-input v-model="addForm.subLanguage" autocomplete="off"></el-input>
@@ -205,14 +204,6 @@
         </el-dialog>
         <el-dialog title="导入" :visible.sync="dialogImportVisible" @close="importFromClose">
             <el-form :model="importForm">
-                <!--<el-form-item label="考试日期" :label-width="formLabelWidth">
-                    <el-date-picker
-                            v-model="importForm.examTime"
-                            type="datetime"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                            placeholder="选择日期时间">
-                    </el-date-picker>
-                </el-form-item>-->
                 <el-form-item label="考试轮次" :label-width="formLabelWidth">
                     <el-select v-model="importForm.semesterId" >
                         <el-option :label="item.semesterName" :value="item.semesterId" v-for="item in dateNameArr"></el-option>
@@ -227,7 +218,7 @@
                 </el-form-item>
                 <el-form-item label="班级" :label-width="formLabelWidth">
                     <el-select v-model="importForm.classId">
-                        <el-option :label="item.gradeClassName" :value="item.classId" v-for="item in classNameArr"></el-option>
+                        <el-option :label="item.gradeClassName" :key="item.classId"  :value="item.classId" v-for="item in classNameArr"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="上传成绩" :label-width="formLabelWidth">
@@ -342,10 +333,14 @@
                 classType:'1',
                 dateNameArr:[],
                 classNameArr:[],
+                classNameArrAdd:[],
                 classStudentArr:[],
                 subjectArr:[],
+                subjectArrAdd:[],
                 tableData: [],
+                studentArr: [],
                 tableDataAll: [],
+                classNameArrAll: [],
                 dialogAllVisible:false,
                 dialogAddVisible:false,
                 formLabelWidth:'80px',
@@ -373,7 +368,9 @@
                     classType:'1',
                     classId:''
                 },
-                currentPage4:1,
+                currentPage:1,
+                totalSize:0,
+                pageSize:50,
                 dialogImportVisible:false,
                 paramFile:new FormData()
 
@@ -386,18 +383,48 @@
            this.querySemesterData()
         },
         methods:{
-            handleSizeChange(){
-
+            handleSizeChange(val){
+                this.pageSize=val;
             },
-            handleCurrentChange(){
-
+            handleCurrentChange(val){
+                this.currentPage=val;
             },
             onSearch(){
                 this.queryScoreInfo(this.searchForm)
             },
             // 切换班级分类
             classTypeSelect(val){
-                debugger
+                this.classNameArrAll=[];
+                this.$axiosF('classInfo/list','get',{gradeId:'1',classType:val},res=>{
+                    if(res.data.success){
+                        this.classNameArrAll=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+                // this.queryStudentData(val);
+
+            },
+            // 切换班级
+            classIdSelect(val){
+                this.studentArr=[];
+                this.$axiosF('studentInfo/list','get',{classId:val||''},res=>{
+                    if(res.data.success){
+                        this.studentArr=res.data.data
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+                // this.queryStudentData(val);
+
             },
             //上传文件
             beforeUpload(file){
@@ -420,7 +447,7 @@
                 this.paramFile.append('formData',JSON.stringify(this.importForm));
                 this.$axiosF('scoreInfo/importScore','post',this.paramFile,res=>{
                     if(res.data.success){
-                        this.dialogAddVisible = false;
+                        this.dialogImportVisible = false;
                         this.$message({
                             showClose: true,
                             message: res.data.message,
@@ -439,7 +466,7 @@
             //获取学生分数
             queryScoreInfo(record){
                 this.tableData=[];
-                this.$axiosF('scoreInfo/listByPage','get',{classId:record.classId||'',studentName:record.studentName||"",studentNum:record.studentNum||"",subjectId:record.subjectId||'',semesterId:record.semesterId||"",pageNum:1,pageSize:30},res=>{
+                this.$axiosF('scoreInfo/listByPage','get',{classId:record.classId||'',studentName:record.studentName||"",studentNum:record.studentNum||"",subjectId:record.subjectId||'',semesterId:record.semesterId||"",pageNum:this.currentPage,pageSize:this.pageSize},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data
                     }else{
@@ -466,6 +493,21 @@
                         confirmButtonText: '确定'})
                 })
 
+            },
+            //获取学生列表
+            queryStudentData(record){
+                this.studentArr=[];
+                this.$axiosF('studentInfo/list','get',{studentName:record.studentName||'',studentNum:record.studentNum||'',classId:record.classId||''},res=>{
+                    if(res.data.success){
+                        this.studentArr=res.data.data
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
             },
             //获取班级内学生信息信息
             queryClassStudentData(){
@@ -545,9 +587,20 @@
                 this.addForm={
                     gradeId: '',
                     className: '',
-                    teacherId: '',
-                    classId: '',
-                    classType: ''
+                    teacherId: '1',
+                    classType:'1',
+                    classId:'',
+                    studentNum:'',
+                    studentId:'',
+                    subLanguage:'',
+                    subMathematics:'',
+                    subEnglish:'',
+                    subPhysical:'',
+                    subChemistry:'',
+                    subBiological:'',
+                    subPolitical:'',
+                    subHistory:'',
+                    subGeography:''
                 };
 
             },
@@ -560,14 +613,14 @@
                 }
                 this.$axiosF(url,'post',this.addForm,res=>{
                     if(res.data.success){
+                        this.dialogAddVisible = false;
                         // this.tableData=res.data.data
                         this.$message({
                             showClose: true,
                             message: res.data.message,
                             type: 'success'
                         });
-                        this.queryScoreInfo();
-                        this.dialogAddVisible = false
+                        this.queryScoreInfo({});
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
@@ -633,6 +686,8 @@
             },
             importFromClose(){
                this.dialogAddVisible = false;
+                this.paramFile.delete('scoreFile');
+                this.paramFile.delete('formData');
                this.importForm={
                     examTime:'',
                     semesterId:'',

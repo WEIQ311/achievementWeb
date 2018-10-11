@@ -133,7 +133,7 @@
             }
         },
         mounted(){
-            this.queryStudentData();
+            this.queryStudentData({});
             this.queryClassData();
         },
         methods:{
@@ -142,9 +142,9 @@
                 return this.classArrDataObj[val.classId]||'';
             },
             //获取学生列表
-            queryStudentData(studentName,studentNum){
+            queryStudentData(record){
                 this.tableData=[];
-                this.$axiosF('studentInfo/list','get',{studentName:studentName||'',studentNum:studentNum||''},res=>{
+                this.$axiosF('studentInfo/list','get',{studentName:record.studentName||'',studentNum:record.studentNum||'',classId:record.classId||''},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data
                     }else{
@@ -202,7 +202,7 @@
                             message: res.data.message,
                             type: 'success'
                         });
-                        this.queryStudentData();
+                        this.queryStudentData({});
                         this.dialogAddVisible = false
                     }else{
                         this.$alert(res.data.message, '错误提示', {
@@ -215,7 +215,7 @@
                 });
             },
             onSearch(){
-                this.queryStudentData(this.searchForm.studentName,this.searchForm.studentNum)
+                this.queryStudentData(this.searchForm)
 
             },
             onAdd(){
