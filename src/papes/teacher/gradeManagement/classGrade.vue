@@ -1,7 +1,7 @@
 <template>
     <div id="studentMan_page">
         <div class="headSearch">
-            <el-form class="search_form"   label-width="50px" :model="searchForm" :inline="true">
+            <el-form class="search_form"   label-width="80px" :model="searchForm" :inline="true">
                 <el-form-item label="年级" >
                     <el-select v-model="searchForm.gradeId" size="mini">
                         <el-option value="1" key="1" label="高一"></el-option>
@@ -44,7 +44,7 @@
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="semesterId"
+                        prop="semesterName"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
@@ -136,7 +136,7 @@
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="semesterId"
+                        prop="semesterName"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
@@ -227,7 +227,8 @@
             }
         },
         mounted(){
-            this.querySemesterData()
+            this.querySemesterData();
+            this.queryClassScoreData({})
         },
         methods:{
             onSearch(){
@@ -252,7 +253,7 @@
             //获取班级成绩数据
             queryClassScoreData(record){
                 this.tableData=[];
-                this.$axiosF('listByClass/list','get',{gradeId:record.gradeId||'1',semesterId:record.semesterId||'',classType:record.classType||''},res=>{
+                this.$axiosF('scoreInfo/listByClass','get',{gradeId:record.gradeId||'1',semesterId:record.semesterId||'',classType:record.classType||''},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data;
                     }else{

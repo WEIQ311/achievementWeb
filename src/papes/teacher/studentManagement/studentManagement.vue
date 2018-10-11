@@ -81,7 +81,7 @@
                 <el-button type="primary" @click="onSubmit">确 定</el-button>
             </div>
         </el-dialog>
-     <!--   <el-dialog title="联系人" :visible.sync="dialogAddVisible" @close="addStudentClose">
+        <el-dialog title="联系人" :visible.sync="dialogContactsVisible" @close="addStudentClose">
             <el-form :model="contactsForm">
                 <el-form-item label="父亲" :label-width="formLabelWidth">
                     <el-input v-model="contactsForm.studentName" autocomplete="off"></el-input>
@@ -89,19 +89,21 @@
                 <el-form-item label="母亲" :label-width="formLabelWidth">
                     <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="父亲联系方式" :label-width="formLabelWidth">
+                <el-form-item label="父亲手机号" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="母亲联系方式" :label-width="formLabelWidth">
+                <el-form-item label="母亲手机号" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
                 </el-form-item>
-
                 <el-form-item label="家庭地址" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="">取 消</el-button>
                 <el-button type="primary" @click="onSubmit">确 定</el-button>
             </div>
-        </el-dialog>-->
+        </el-dialog>
     </div>
 </template>
 
@@ -129,6 +131,7 @@
                 classArrData: [],
                 classArrDataObj:{},
                 dialogAddVisible:false,
+                dialogContactsVisible:false,
                 addFlag:true
             }
         },
@@ -243,7 +246,7 @@
             handleEdit(index,row){
                 this.addFlag=false;
                 this.dialogAddVisible=true;
-                this. addForm={
+                this.addForm={
                     studentName: row.studentName,
                     studentNum: row.studentNum,
                     studentId: row.studentId,
@@ -253,7 +256,7 @@
             },
             // 学生联系人
             handleConnet(index,row){
-
+                this.dialogContactsVisible=true;
             }
         }
     }

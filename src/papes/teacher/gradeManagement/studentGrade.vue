@@ -162,7 +162,8 @@
                 </el-form-item>
                 <el-form-item label="考生姓名" :label-width="formLabelWidth">
                     <el-select v-model="addForm.studentId" placeholder="">
-                        <el-option :label="item.studentName" :value="item.studentId" :key="item.studentId" v-if=" item in studentArr"></el-option>
+                        <el-option :label="item.studentName" :value="item.studentId" :key="item.studentId"
+                                   v-for=" item in studentArr"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="语文" :label-width="formLabelWidth">
@@ -230,7 +231,6 @@
                         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
                     </el-upload>
                 </el-form-item>
-
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="importFromClose">取 消</el-button>
@@ -560,6 +560,7 @@
             onAdd(){
                 this.addFlag=true;
                 this.dialogAddVisible=true;
+                this.classTypeSelect('1');
             },
             addFormClose(){
                 this.addFlag=true;
@@ -632,6 +633,7 @@
                 });
             },
             handleEdit(index,row){
+                this.classTypeSelect('1');
                 this.addFlag=true;
                 this.dialogAddVisible=true;
                 this.addForm={
