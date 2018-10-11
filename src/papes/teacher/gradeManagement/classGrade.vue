@@ -48,14 +48,6 @@
                         label="轮次">
                 </el-table-column>
                 <el-table-column
-                        prop="studentName"
-                        label="姓名">
-                </el-table-column>
-                <el-table-column
-                        prop="studentNum"
-                        label="学号">
-                </el-table-column>
-                <el-table-column
                         prop="gradeClassName"
                         width="100"
                         label="班级">
@@ -104,7 +96,7 @@
                         label="总分">
                 </el-table-column>
                 <el-table-column
-                        prop="gradeRanking"
+                        prop="classRanking"
                         label="排名">
                 </el-table-column>
                 <el-table-column
@@ -140,14 +132,6 @@
                         label="轮次">
                 </el-table-column>
                 <el-table-column
-                        prop="studentName"
-                        label="姓名">
-                </el-table-column>
-                <el-table-column
-                        prop="studentNum"
-                        label="学号">
-                </el-table-column>
-                <el-table-column
                         prop="gradeClassName"
                         width="100"
                         label="班级">
@@ -196,7 +180,7 @@
                         label="总分">
                 </el-table-column>
                 <el-table-column
-                        prop="gradeRanking"
+                        prop="classRanking"
                         label="排名">
                 </el-table-column>
             </el-table>

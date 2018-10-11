@@ -186,7 +186,7 @@
             //获取教师列表
             queryTeacherData(record){
                 this.tableData=[];
-                this.$axiosF('teacherInfo/list','get',{teacherName:record.teacherName||'',teacherDuty:record.teacherDuty||'',teacherNum:record.teacherNum||''},res=>{
+                this.$axiosF('teacherInfo/list','get',{teacherName:record.teacherName||'',teacherDuty:record.teacherDuty||'',teacherNum:record.teacherNum||'',subjectId:record.subjectId||''},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data
                     }else{
