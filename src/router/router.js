@@ -8,6 +8,7 @@ import studentManagement from '../papes/teacher/studentManagement/studentManagem
 import classManagement from '../papes/teacher/system/classManagement'
 import teacherManagement from '../papes/teacher/system/teacherManagement'
 import subjectManagement from '../papes/teacher/system/subjectManagement'
+import semesterManagement from '../papes/teacher/system/semesterManagement'
 export default [{
     path: '/',
     component: App, //顶层路由，对应index.html
@@ -49,6 +50,10 @@ export default [{
                 path: 'subjectManagement',
                 name: "subjectManagement",
                 component: subjectManagement,
+            },{
+                path: 'semesterManagement',
+                name: "semesterManagement",
+                component: semesterManagement,
             }]
         }
     ]

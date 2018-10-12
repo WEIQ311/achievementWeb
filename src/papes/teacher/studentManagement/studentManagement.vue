@@ -8,6 +8,11 @@
                 <el-form-item label="学号" >
                     <el-input v-model="searchForm.studentNum"  size="mini"></el-input>
                 </el-form-item>
+                <el-form-item label="班级" >
+                    <el-select v-model="searchForm.classId"  size="mini" >
+                        <el-option :value="item.classId" :key="item.classId" :label="item.gradeClassName" v-for="item in classArrData"></el-option>
+                    </el-select>
+                </el-form-item>
                 <div style="display: inline-block;height: 40px;line-height: 40px">
                     <el-button @click="onSearch"  size="mini">查询</el-button>
                     <el-button @click="onAdd"  size="mini">新增</el-button>
@@ -40,9 +45,12 @@
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        width="150"
+                        width="260"
                         label="操作">
                     <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleConnet(scope.$index, scope.row)">联系人</el-button>
                         <el-button
                                 size="mini"
                                 @click="handleEdit(scope.$index, scope.row)">修改</el-button>
@@ -73,6 +81,29 @@
                 <el-button type="primary" @click="onSubmit">确 定</el-button>
             </div>
         </el-dialog>
+        <el-dialog title="联系人" :visible.sync="dialogContactsVisible" @close="addStudentClose">
+            <el-form :model="contactsForm">
+                <el-form-item label="父亲" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentName" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="母亲" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="父亲手机号" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="母亲手机号" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="家庭地址" :label-width="formLabelWidth">
+                    <el-input v-model="contactsForm.studentNum" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="">取 消</el-button>
+                <el-button type="primary" @click="onSubmit">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -84,7 +115,8 @@
                 formLabelWidth:'80px',
                 searchForm:{
                     studentName:'',
-                    studentNum:''
+                    studentNum:'',
+                    classId:''
                 },
                 addForm:{
                     studentName: '',
@@ -92,15 +124,19 @@
                     studentId: '',
                     classId: ''
                 },
+                contactsForm:{
+
+                },
                 tableData: [],
                 classArrData: [],
                 classArrDataObj:{},
                 dialogAddVisible:false,
+                dialogContactsVisible:false,
                 addFlag:true
             }
         },
         mounted(){
-            this.queryStudentData();
+            this.queryStudentData({});
             this.queryClassData();
         },
         methods:{
@@ -109,9 +145,9 @@
                 return this.classArrDataObj[val.classId]||'';
             },
             //获取学生列表
-            queryStudentData(studentName,studentNum){
+            queryStudentData(record){
                 this.tableData=[];
-                this.$axiosF('studentInfo/list','get',{studentName:studentName||'',studentNum:studentNum||''},res=>{
+                this.$axiosF('studentInfo/list','get',{studentName:record.studentName||'',studentNum:record.studentNum||'',classId:record.classId||''},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data
                     }else{
@@ -119,7 +155,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
@@ -139,7 +175,7 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
@@ -169,7 +205,7 @@
                             message: res.data.message,
                             type: 'success'
                         });
-                        this.queryStudentData();
+                        this.queryStudentData({});
                         this.dialogAddVisible = false
                     }else{
                         this.$alert(res.data.message, '错误提示', {
@@ -177,12 +213,12 @@
                     }
 
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 });
             },
             onSearch(){
-                this.queryStudentData(this.searchForm.studentName,this.searchForm.studentNum)
+                this.queryStudentData(this.searchForm)
 
             },
             onAdd(){
@@ -203,20 +239,24 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
             handleEdit(index,row){
                 this.addFlag=false;
                 this.dialogAddVisible=true;
-                this. addForm={
+                this.addForm={
                     studentName: row.studentName,
                     studentNum: row.studentNum,
                     studentId: row.studentId,
                     classId: row.classId,
                     telPhone: row.telPhone
                 };
+            },
+            // 学生联系人
+            handleConnet(index,row){
+                this.dialogContactsVisible=true;
             }
         }
     }

@@ -1,15 +1,15 @@
 <template>
     <div id="login_page">
-        <el-form class="login_form" :label-position="labelPosition" label-width="80px" :model="loginForm">
+        <el-form class="login_form" :label-position="labelPosition" label-width="80px" :model="formLabelAlign">
             <el-form-item label="用户名">
                 <el-input v-model="formLabelAlign.name"></el-input>
             </el-form-item>
             <el-form-item label="密码">
-                <el-input v-model="formLabelAlign.region"></el-input>
+                <el-input v-model="formLabelAlign.region" ></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button @click="onLoginOut">登陆</el-button>
-                <el-button>注册</el-button>
+                <el-button @click="onCancle">清空</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -21,7 +21,7 @@
         data() {
             return {
                 labelPosition: 'right',
-                loginForm: {
+                formLabelAlign: {
                     name: '',
                     region: ''
                 }
@@ -29,7 +29,25 @@
         },
         methods:{
             onLoginOut(){
-                this.$router.push('/student')
+                this.$axiosF('','post',{},res=>{
+                    if(res.data.success){
+                        this.$message({
+                            showClose: true,
+                            message: res.data.message,
+                            type: 'success'
+                        });
+                        this.$router.push('/teacher')
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                });
+            },
+            onCancle(){
+                this.$router.push('/teacher')
             }
         }
     }

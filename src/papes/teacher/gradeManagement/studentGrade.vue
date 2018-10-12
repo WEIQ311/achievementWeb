@@ -6,21 +6,21 @@
                     <el-input v-model="searchForm.studentName" size="mini"></el-input>
                 </el-form-item>
                 <el-form-item label="学号" >
-                    <el-input v-model="searchForm.studentID"  size="mini"></el-input>
+                    <el-input v-model="searchForm.studentNum"  size="mini"></el-input>
                 </el-form-item>
                 <el-form-item label="轮次" >
-                    <el-select v-model="searchForm.dateName" size="mini">
-                        <el-option :label="item" :value="item" v-for="item in dateNameArr"></el-option>
+                    <el-select v-model="searchForm.semesterId" size="mini">
+                        <el-option :label="item.semesterName" :value="item.semesterId" v-for="item in dateNameArr"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级" >
-                    <el-select v-model="searchForm.className" size="mini">
-                        <el-option :label="item" :value="item" v-for="item in classNameArr"></el-option>
+                    <el-select v-model="searchForm.classId" size="mini">
+                        <el-option :label="item.gradeClassName" :value="item.classId" v-for="item in classNameArr"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="科目" >
-                    <el-select v-model="searchForm.subject" size="mini">
-                        <el-option :label="item" :value="item" v-for="item in subjectArr"></el-option>
+                <el-form-item label="科目"  v-if="false">
+                    <el-select v-model="searchForm.subjectId" size="mini">
+                        <el-option :label="item.subjectName" :value="item.subjectId" v-for="item in subjectArr"></el-option>
                     </el-select>
                 </el-form-item>
                 <div style="display: inline-block;height: 40px;line-height: 40px">
@@ -37,21 +37,20 @@
                     stripe
                     border
                     height="calc(100% - 50px)"
-                    show-summary
-                    :summary-method="getSummaries"
                     style="width: 100%">
+               <!-- show-summary
+                :summary-method="getSummaries"-->
                 <el-table-column
                         type="index"
                         width="50"
                         label="序号">
                 </el-table-column>
                 <el-table-column
-                        v-if="false"
-                        prop="date"
+                        prop="examTime"
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="dateName"
+                        prop="semesterName"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
@@ -59,47 +58,63 @@
                         label="姓名">
                 </el-table-column>
                 <el-table-column
-                        prop="studentID"
+                        prop="studentNum"
                         label="学号">
                 </el-table-column>
                 <el-table-column
-                        prop="className"
+                        prop="gradeClassName"
+                        width="100"
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        prop="Chinese"
+                        prop="subLanguage"
                         label="语文">
                 </el-table-column>
                 <el-table-column
-                        prop="mathematics"
+                        prop="subMathematics"
                         label="数学">
                 </el-table-column>
                 <el-table-column
-                        prop="English"
+                        prop="subEnglish"
                         label="英语">
                 </el-table-column>
                 <el-table-column
-                        prop="physical"
+                        prop="subPhysical"
                         label="物理">
                 </el-table-column>
                 <el-table-column
-                        prop="Chemistry"
+                        prop="subChemistry"
                         label="化学">
                 </el-table-column>
                 <el-table-column
-                        prop="biological"
+                        prop="subBiological"
                         label="生物">
                 </el-table-column>
                 <el-table-column
-                        prop="allSum"
+                        v-if="classType==='2'"
+                        prop="subPolitical"
+                        label="政治">
+                </el-table-column>
+                <el-table-column
+                        v-if="classType==='2'"
+                        prop="subHistory"
+                        label="历史">
+                </el-table-column>
+                <el-table-column
+                        v-if="classType==='2'"
+                        prop="subGeography"
+                        label="地理">
+                </el-table-column>
+                <el-table-column
+                        prop="subScoreSum"
                         label="总分">
                 </el-table-column>
                 <el-table-column
-                        prop="classIndex"
+                        prop="classRanking"
                         label="班级排名">
                 </el-table-column>
                 <el-table-column
-                        prop="allIndex"
+                        prop="gradeRanking"
                         label="年级排名">
                 </el-table-column>
                 <el-table-column
@@ -119,96 +134,110 @@
             <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
-                    :current-page="currentPage4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
+                    :current-page="currentPage"
+                    :page-sizes="[30, 50, 100, 200]"
+                    :page-size="pageSize"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
+                    :total="totalSize">
             </el-pagination>
         </div>
-        <el-dialog :title="addFlag?'新增':'修改'" :visible.sync="dialogAddVisible">
-            <el-form :model="gradeForm">
-                <el-form-item label="考试日期" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.date" autocomplete="off"></el-input>
-                </el-form-item>
+        <el-dialog :title="addFlag?'新增':'修改'" :visible.sync="dialogAddVisible" @close="addFormClose">
+            <el-form :model="addForm">
                 <el-form-item label="考试轮次" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.dateName" autocomplete="off"></el-input>
+                    <el-select v-model="addForm.semesterId" >
+                        <el-option :label="item.semesterName" :value="item.semesterId" v-for="item in dateNameArr"></el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="考生分类" :label-width="formLabelWidth">
-                    <el-select v-model="importForm.studentType" placeholder="">
+                <el-form-item label="班级分类" :label-width="formLabelWidth"  >
+                    <el-select v-model="addForm.classType" placeholder="" @change="classTypeSelect">
+                        <el-option label="理科" value="1"></el-option>
+                        <el-option label="文科" value="2"></el-option>
+                        <el-option label="未分科" value="3"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="班级" :label-width="formLabelWidth" >
+                    <el-select v-model="addForm.classId"  @change="classIdSelect" >
+                        <el-option :label="item.gradeClassName" :value="item.classId" v-for="item in classNameArrAll"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="考生姓名" :label-width="formLabelWidth">
+                    <el-select v-model="addForm.studentId" placeholder="">
+                        <el-option :label="item.studentName" :value="item.studentId" :key="item.studentId"
+                                   v-for=" item in studentArr"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="语文" :label-width="formLabelWidth">
+                    <el-input v-model="addForm.subLanguage" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="数学" :label-width="formLabelWidth">
+                    <el-input v-model="addForm.subMathematics" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="英语" :label-width="formLabelWidth">
+                    <el-input v-model="addForm.subEnglish" autocomplete="off"></el-input>
+                </el-form-item>
+                <div v-if="addForm.classType=='1'||addForm.classType=='3'">
+                    <el-form-item label="物理" :label-width="formLabelWidth">
+                        <el-input v-model="addForm.subPhysical" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="化学" :label-width="formLabelWidth">
+                        <el-input v-model="addForm.subChemistry" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="生物" :label-width="formLabelWidth">
+                        <el-input v-model="addForm.subBiological" autocomplete="off"></el-input>
+                    </el-form-item>
+                </div>
+                <div v-if="addForm.classType=='2'||addForm.classType=='3'">
+                    <el-form-item label="政治" :label-width="formLabelWidth">
+                        <el-input v-model="addForm.subPolitical" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="历史" :label-width="formLabelWidth">
+                        <el-input v-model="addForm.subHistory" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="地理" :label-width="formLabelWidth">
+                        <el-input v-model="addForm.subGeography" autocomplete="off"></el-input>
+                    </el-form-item>
+                </div>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="addFormClose">取 消</el-button>
+                <el-button type="primary" @click="onSubmit">确 定</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog title="导入" :visible.sync="dialogImportVisible" @close="importFromClose">
+            <el-form :model="importForm">
+                <el-form-item label="考试轮次" :label-width="formLabelWidth">
+                    <el-select v-model="importForm.semesterId" >
+                        <el-option :label="item.semesterName" :value="item.semesterId" v-for="item in dateNameArr"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="学生分类" :label-width="formLabelWidth">
+                    <el-select v-model="importForm.classType" placeholder="">
                         <el-option label="理科" value="1"></el-option>
                         <el-option label="文科" value="2"></el-option>
                         <el-option label="未分科" value="3"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.className" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="学号" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.studentID" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="考生姓名" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.studentName" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="语文" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.Chinese" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="数学" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.mathematics" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="英语" :label-width="formLabelWidth">
-                    <el-input v-model="importForm.English" autocomplete="off"></el-input>
-                </el-form-item>
-                <div v-if="importForm.studentType=='1'||importForm.studentType=='3'">
-                    <el-form-item label="物理" :label-width="formLabelWidth">
-                        <el-input v-model="importForm.physical" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="化学" :label-width="formLabelWidth">
-                        <el-input v-model="importForm.Chemistry" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="生物" :label-width="formLabelWidth">
-                        <el-input v-model="importForm.biological" autocomplete="off"></el-input>
-                    </el-form-item>
-                </div>
-                <div v-if="importForm.studentType=='2'||importForm.studentType=='3'">
-                    <el-form-item label="政治" :label-width="formLabelWidth">
-                        <el-input v-model="importForm.political" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="历史" :label-width="formLabelWidth">
-                        <el-input v-model="importForm.history" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="地理" :label-width="formLabelWidth">
-                        <el-input v-model="importForm.geography" autocomplete="off"></el-input>
-                    </el-form-item>
-                </div>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogAddVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogAddVisible = false">确 定</el-button>
-            </div>
-        </el-dialog>
-        <el-dialog title="导入" :visible.sync="dialogImportVisible">
-            <el-form :model="importForm">
-                <el-form-item label="考试日期" :label-width="formLabelWidth">
-                    <el-input v-model="gradeForm.date" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="考试轮次" :label-width="formLabelWidth">
-                    <el-input v-model="gradeForm.dateName" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="学生分类" :label-width="formLabelWidth">
-                    <el-select v-model="gradeForm.studentType" placeholder="">
-                        <el-option label="理科" value="1"></el-option>
-                        <el-option label="文科" value="2"></el-option>
-                        <el-option label="未分科" value="3"></el-option>
+                    <el-select v-model="importForm.classId">
+                        <el-option :label="item.gradeClassName" :key="item.classId"  :value="item.classId" v-for="item in classNameArr"></el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="上传成绩" :label-width="formLabelWidth">
+                    <el-upload
+                            class="upload-demo"
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :before-upload="beforeUpload">
+                        <el-button size="small" type="primary">点击上传</el-button>
+                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                    </el-upload>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogAddVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogAddVisible = false">确 定</el-button>
+                <el-button @click="importFromClose">取 消</el-button>
+                <el-button type="primary" @click="onImportSubmit">确 定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="详情" :visible.sync="dialogAllVisible" class="dialogInfo">
+        <el-dialog title="详情" :visible.sync="dialogAllVisible" class="dialogInfo" >
             <el-table
                     :data="tableDataAll"
                     stripe
@@ -221,55 +250,63 @@
                         label="序号">
                 </el-table-column>
                 <el-table-column
-                        prop="date"
+                        prop="examTime"
                         label="日期">
                 </el-table-column>
                 <el-table-column
-                        prop="dateName"
+                        prop="semesterId"
                         label="轮次">
                 </el-table-column>
                 <el-table-column
-                        prop="studentName"
-                        label="姓名">
-                </el-table-column>
-                <el-table-column
-                        prop="studentID"
-                        label="学号">
-                </el-table-column>
-                <el-table-column
-                        prop="className"
+                        prop="gradeClassName"
                         label="班级">
                 </el-table-column>
                 <el-table-column
-                        prop="Chinese"
+                        prop="subLanguage"
                         label="语文">
                 </el-table-column>
                 <el-table-column
-                        prop="mathematics"
+                        prop="subMathematics"
                         label="数学">
                 </el-table-column>
                 <el-table-column
-                        prop="English"
+                        prop="subEnglish"
                         label="英语">
                 </el-table-column>
                 <el-table-column
-                        prop="physical"
+                        prop="subPhysical"
                         label="物理">
                 </el-table-column>
                 <el-table-column
-                        prop="Chemistry"
+                        prop="subChemistry"
                         label="化学">
                 </el-table-column>
                 <el-table-column
-                        prop="biological"
+                        prop="subBiological"
                         label="生物">
                 </el-table-column>
                 <el-table-column
-                        prop="allSum"
+                        prop="subPolitical"
+                        label="政治">
+                </el-table-column>
+                <el-table-column
+                        prop="subHistory"
+                        label="历史">
+                </el-table-column>
+                <el-table-column
+                        prop="subGeography"
+                        label="地理">
+                </el-table-column>
+                <el-table-column
+                        prop="subScoreSum"
                         label="总分">
                 </el-table-column>
                 <el-table-column
-                        prop="allIndex"
+                        prop="classRanking"
+                        label="班级排名">
+                </el-table-column>
+                <el-table-column
+                        prop="gradeRanking"
                         label="年级排名">
                 </el-table-column>
             </el-table>
@@ -288,120 +325,148 @@
             return{
                 searchForm:{
                     studentName:'',
-                    studentID:'',
-                    dateName:'',
-                    className:'',
+                    studentNum:'',
+                    semesterId:'',
+                    classId:'',
+                    subjectId:'',
                 },
-                dateNameArr:['第一次月考','第二次月考','第三次月考'],
-                classNameArr:['高二1班','高二2班','高二3班'],
-                subjectArr:['语文','数学','英语','物理','化学','生物','政治','历史','地理'],
-                tableData: [{
-                    date: '2016-05-02',
-                    dateName: '第一次月考',
-                    studentName: '王小二',
-                    studentID: '211109',
-                    className : '高二1班',
-                    Chinese : '100',
-                    mathematics : '88',
-                    English:'108',
-                    physical : '88',
-                    Chemistry : '33',
-                    biological : '66',
-                    classIndex : '36',
-                    allSum : '366',
-                    allIndex:88
-                }],
-                tableDataAll: [{
-                    date: '2016-05-02',
-                    dateName: '第一次月考',
-                    studentName: '王小二',
-                    studentID: '211109',
-                    className : '高二1班',
-                    Chinese : '100',
-                    mathematics : '88',
-                    English:'108',
-                    physical : '88',
-                    Chemistry : '33',
-                    biological : '66',
-                    classIndex : '36',
-                    allSum : '366',
-                    allIndex:48
-                },{
-                    date: '2016-05-02',
-                    dateName: '第二次月考',
-                    studentName: '王小二',
-                    studentID: '211109',
-                    className : '高二1班',
-                    Chinese : '100',
-                    mathematics : '88',
-                    English:'108',
-                    physical : '88',
-                    Chemistry : '33',
-                    biological : '66',
-                    classIndex : '36',
-                    allSum : '366',
-                    allIndex:98
-                },{
-                    date: '2016-05-02',
-                    dateName: '第三次月考',
-                    studentName: '王小二',
-                    studentID: '211109',
-                    className : '高二1班',
-                    Chinese : '100',
-                    mathematics : '88',
-                    English:'108',
-                    physical : '88',
-                    Chemistry : '33',
-                    biological : '66',
-                    classIndex : '36',
-                    allSum : '366',
-                    allIndex:88
-                }],
+                classType:'1',
+                dateNameArr:[],
+                classNameArr:[],
+                classNameArrAdd:[],
+                classStudentArr:[],
+                subjectArr:[],
+                subjectArrAdd:[],
+                tableData: [],
+                studentArr: [],
+                tableDataAll: [],
+                classNameArrAll: [],
                 dialogAllVisible:false,
                 dialogAddVisible:false,
                 formLabelWidth:'80px',
                 addFlag:true,
-                gradeForm:{
-                    date:'',
-                    dateName:'',
-                    studentType:'1',
-                    className:'',
-                    studentID:'',
-                    studentName:'',
-                    Chinese:'',
-                    mathematics:'',
-                    English:'',
-                    physical:'',
-                    Chemistry:'',
-                    biological:'',
-                    political:'',
-                    history:'',
-                    geography:''
+                addForm:{
+                    examTime:'',
+                    semesterId:'',
+                    classType:'1',
+                    classId:'',
+                    studentNum:'',
+                    studentId:'',
+                    subLanguage:'',
+                    subMathematics:'',
+                    subEnglish:'',
+                    subPhysical:'',
+                    subChemistry:'',
+                    subBiological:'',
+                    subPolitical:'',
+                    subHistory:'',
+                    subGeography:''
                 },
                 importForm:{
-                    date:'',
-                    dateName:'',
-                    studentType:'1',
+                    examTime:'',
+                    semesterId:'',
+                    classType:'1',
+                    classId:''
                 },
-                currentPage4:1,
+                currentPage:1,
+                totalSize:0,
+                pageSize:50,
                 dialogImportVisible:false,
+                paramFile:new FormData()
 
             }
         },
         mounted(){
-           this.queryScoreInfo({})
+           this.queryScoreInfo({});
+           this.querySubjectData();
+           this.queryClassData();
+           this.querySemesterData()
         },
         methods:{
-            handleSizeChange(){
+            handleSizeChange(val){
+                this.pageSize=val;
+            },
+            handleCurrentChange(val){
+                this.currentPage=val;
+            },
+            onSearch(){
+                this.queryScoreInfo(this.searchForm)
+            },
+            // 切换班级分类
+            classTypeSelect(val){
+                this.classNameArrAll=[];
+                this.$axiosF('classInfo/list','get',{gradeId:'1',classType:val},res=>{
+                    if(res.data.success){
+                        this.classNameArrAll=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+                // this.queryStudentData(val);
 
             },
-            handleCurrentChange(){
+            // 切换班级
+            classIdSelect(val){
+                this.studentArr=[];
+                this.$axiosF('studentInfo/list','get',{classId:val||''},res=>{
+                    if(res.data.success){
+                        this.studentArr=res.data.data
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+                // this.queryStudentData(val);
 
+            },
+            //上传文件
+            beforeUpload(file){
+                this.paramFile.delete('scoreFile');
+                const isExcel = file.name.split('.')[file.name.split('.').length-1] === 'xlsx'|| file.name.split('.')[file.name.split('.').length-1] === 'xls';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+                if (!isExcel) {
+                    this.$message.error('上传头像文件只能是xls/xlsx 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像文件大小不能超过 2MB!');
+                }
+                if(isExcel&&isLt2M){
+                    this.paramFile.append('scoreFile',file)
+                }
+                return false;
+            },
+            //上传文件确定按钮
+            onImportSubmit(){
+                this.paramFile.append('formData',JSON.stringify(this.importForm));
+                this.$axiosF('scoreInfo/importScore','post',this.paramFile,res=>{
+                    if(res.data.success){
+                        this.dialogImportVisible = false;
+                        this.$message({
+                            showClose: true,
+                            message: res.data.message,
+                            type: 'success'
+                        });
+                        this.queryScoreInfo({})
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                });
             },
             //获取学生分数
             queryScoreInfo(record){
                 this.tableData=[];
-                this.$axiosF('scoreInfo/listByPage','get',{classId:record.classId||'',studentId:record.studentId||'',subjectId:record.subjectId||'',semesterId:record.semesterId||"",pageNum:1,pageSize:30},res=>{
+                this.$axiosF('scoreInfo/listByPage','get',{classId:record.classId||'',studentName:record.studentName||"",studentNum:record.studentNum||"",subjectId:record.subjectId||'',semesterId:record.semesterId||"",pageNum:this.currentPage,pageSize:this.pageSize},res=>{
                     if(res.data.success){
                         this.tableData=res.data.data
                     }else{
@@ -409,52 +474,187 @@
                             confirmButtonText: '确定'})
                     }
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 })
             },
-            //
+            //获取班级信息
+            queryClassData(){
+                this.classNameArr=[];
+                this.$axiosF('classInfo/list','get',{gradeId:'1',classType:'1'},res=>{
+                    if(res.data.success){
+                        this.classNameArr=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+
+            },
+            //获取学生列表
+            queryStudentData(record){
+                this.studentArr=[];
+                this.$axiosF('studentInfo/list','get',{studentName:record.studentName||'',studentNum:record.studentNum||'',classId:record.classId||''},res=>{
+                    if(res.data.success){
+                        this.studentArr=res.data.data
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+            },
+            //获取班级内学生信息信息
+            queryClassStudentData(){
+                this.classStudentArr=[];
+                this.$axiosF('studentInfo/list','get',{classId:classId||''},res=>{
+                    if(res.data.success){
+                        this.classStudentArr=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+
+            },
+            //获取轮次信息
+            querySemesterData(){
+                this.dateNameArr=[];
+                this.$axiosF('semesterInfo/list','get',{gradeId:'1'},res=>{
+                    if(res.data.success){
+                        this.dateNameArr=res.data.data;
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+
+            },
+            //获取科目信息
+            querySubjectData(){
+                this.subjectArr=[];
+                this.$axiosF('subjectInfo/list','get',{},res=>{
+                    if(res.data.success){
+                        this.subjectArr=res.data.data
+                    }else{
+                        this.$alert(res.data.message, '错误提示', {
+                            confirmButtonText: '确定'})
+                    }
+                },err=>{
+                    this.$alert(err.message, '错误提示', {
+                        confirmButtonText: '确定'})
+                })
+
+            },
             onAdd(){
                 this.addFlag=true;
                 this.dialogAddVisible=true;
+                this.classTypeSelect('1');
+            },
+            addFormClose(){
+                this.addFlag=true;
+                this.dialogAddVisible=false;
+                this.addForm={
+                    examTime:'',
+                        semesterId:'',
+                        classType:'1',
+                        classId:'',
+                        studentNum:'',
+                        studentId:'',
+                        subLanguage:'',
+                        subMathematics:'',
+                        subEnglish:'',
+                        subPhysical:'',
+                        subChemistry:'',
+                        subBiological:'',
+                        subPolitical:'',
+                        subHistory:'',
+                        subGeography:''
+                }
             },
             addClassClose(){
                 this.addFlag=true;
                 this.addForm={
                     gradeId: '',
                     className: '',
-                    teacherId: '',
-                    classId: '',
-                    classType: ''
+                    teacherId: '1',
+                    classType:'1',
+                    classId:'',
+                    studentNum:'',
+                    studentId:'',
+                    subLanguage:'',
+                    subMathematics:'',
+                    subEnglish:'',
+                    subPhysical:'',
+                    subChemistry:'',
+                    subBiological:'',
+                    subPolitical:'',
+                    subHistory:'',
+                    subGeography:''
                 };
 
             },
             onSubmit(){
                 let url='';
                 if(this.addFlag){
-                    url='classInfo/insert'
+                    url='scoreInfo/insert'
                 }else{
-                    url='classInfo/update'
+                    url='scoreInfo/update'
                 }
                 this.$axiosF(url,'post',this.addForm,res=>{
                     if(res.data.success){
+                        this.dialogAddVisible = false;
                         // this.tableData=res.data.data
                         this.$message({
                             showClose: true,
                             message: res.data.message,
                             type: 'success'
                         });
-                        this.queryClass();
-                        this.dialogAddVisible = false
+                        this.queryScoreInfo({});
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
                     }
 
                 },err=>{
-                    this.$alert(err.data.message, '错误提示', {
+                    this.$alert(err.message, '错误提示', {
                         confirmButtonText: '确定'})
                 });
+            },
+            handleEdit(index,row){
+                this.classTypeSelect('1');
+                this.addFlag=true;
+                this.dialogAddVisible=true;
+                this.addForm={
+                    gradeId: row.gradeId,
+                    examTime: row.examTime,
+                    semesterId: row.semesterId,
+                    classType: row.classType,
+                    classId: row.classId,
+                    studentNum: row.studentNum,
+                    studentId: row.studentId,
+                    subLanguage: row.subLanguage,
+                    subMathematics: row.subMathematics,
+                    subEnglish: row.subEnglish,
+                    subPhysical: row.subPhysical,
+                    subChemistry: row.subChemistry,
+                    subBiological: row.subBiological,
+                    subPolitical: row.subPolitical,
+                    subHistory: row.subHistory,
+                    subGeography: row.subGeography
+                };
+
             },
             getSummaries(param){
                 const { columns, data } = param;
@@ -486,23 +686,22 @@
                 this.dialogImportVisible=true
 
             },
+            importFromClose(){
+               this.dialogAddVisible = false;
+                this.paramFile.delete('scoreFile');
+                this.paramFile.delete('formData');
+               this.importForm={
+                    examTime:'',
+                    semesterId:'',
+                    classType:'1',
+                    classId:''
+                }
+            },
             onDownLoad(){
-                window.open();
+                window.open(window.baseURL+'scoreInfo/exportScoreTemplate?classId=1','_self');
             },
             handleInfo(){
                 this.dialogAllVisible=true;
-            },
-            handleEdit(index,row){
-                this.addFlag=true;
-                this.dialogAddVisible=true;
-                this.addForm={
-                    gradeId: row.gradeId,
-                    className: row.className,
-                    teacherId: row.teacherId,
-                    classId: row.classId,
-                    classType: row.classType
-                };
-
             }
         }
     }
@@ -524,6 +723,15 @@
 <style>
     .el-select{
         width: 100%;
+    }
+    body .el-table th.gutter {
+        display: table-cell !important;
+    }
+     tr td,th{
+        text-align: center!important;
+    }
+    .el-date-editor{
+        width: 100%!important;
     }
     .headSearch .el-form-item__content{
         width: 130px!important;

@@ -34,6 +34,7 @@
                         <el-menu-item-group>
                             <el-menu-item index="classManagement">班级管理</el-menu-item>
                             <el-menu-item index="teacherManagement">教师管理</el-menu-item>
+                            <el-menu-item index="semesterManagement">考试轮次</el-menu-item>
                             <el-menu-item index="subjectManagement">科目查看</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
