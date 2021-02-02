@@ -68,18 +68,22 @@
                 </el-table-column>
                 <el-table-column
                         prop="subLanguage"
+                        :width="subjectWidth"
                         label="语文">
                 </el-table-column>
                 <el-table-column
                         prop="subMathematics"
+                        :width="subjectWidth"
                         label="数学">
                 </el-table-column>
                 <el-table-column
                         prop="subEnglish"
+                        :width="subjectWidth"
                         label="英语">
                 </el-table-column>
                 <el-table-column
                         prop="subPhysical"
+                        :width="subjectWidth"
                         label="物理">
                 </el-table-column>
                 <el-table-column
@@ -88,21 +92,25 @@
                 </el-table-column>
                 <el-table-column
                         prop="subBiological"
+                        :width="subjectWidth"
                         label="生物">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
                         prop="subPolitical"
+                        :width="subjectWidth"
                         label="政治">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
                         prop="subHistory"
+                        :width="subjectWidth"
                         label="历史">
                 </el-table-column>
                 <el-table-column
                         v-if="classType==='2'"
                         prop="subGeography"
+                        :width="subjectWidth"
                         label="地理">
                 </el-table-column>
                 <el-table-column
@@ -330,6 +338,7 @@
                     classId:'',
                     subjectId:'',
                 },
+                subjectWidth:60,
                 classType:'1',
                 dateNameArr:[],
                 classNameArr:[],
@@ -466,9 +475,11 @@
             //获取学生分数
             queryScoreInfo(record){
                 this.tableData=[];
+                this.totalSize=0;
                 this.$axiosF('scoreInfo/listByPage','get',{classId:record.classId||'',studentName:record.studentName||"",studentNum:record.studentNum||"",subjectId:record.subjectId||'',semesterId:record.semesterId||"",pageNum:this.currentPage,pageSize:this.pageSize},res=>{
                     if(res.data.success){
-                        this.tableData=res.data.data
+                        this.tableData=res.data.data;
+                        this.totalSize=res.data.total;
                     }else{
                         this.$alert(res.data.message, '错误提示', {
                             confirmButtonText: '确定'})
@@ -510,7 +521,7 @@
                 })
             },
             //获取班级内学生信息信息
-            queryClassStudentData(){
+            queryClassStudentData(classId){
                 this.classStudentArr=[];
                 this.$axiosF('studentInfo/list','get',{classId:classId||''},res=>{
                     if(res.data.success){

@@ -1,7 +1,6 @@
 {
   "name": "my-project",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -11,6 +10,7 @@
     "axios": "^0.18.0",
     "element": "^0.1.4",
     "element-ui": "^2.4.8",
+    "gojs": "^1.8.31",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1"
   },
